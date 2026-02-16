@@ -1,0 +1,16 @@
+{
+  "name": "mini-sekuritas",
+  "version": "1.0.0",
+  "description": "dummy project to learning the basic of backend with the niche about securities",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Ulhaq Dhifulloh",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1",
+    "nodemon": "^3.1.11"
+  }
+}
