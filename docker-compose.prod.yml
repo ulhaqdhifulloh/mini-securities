@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # Di Production, Database biasanya pakai layanan Cloud (AWS RDS / Azure SQL)
+  # Jadi kita TIDAK butuh container DB di sini.
+  # Tapi kalau mau hemat biaya (pakai DB di container sendiri), boleh tetap ada.
+  
+  app:
+    # Perbedaan 1: Kita tarik Image, bukan Build manual
+    image: ulhaq/mini-sekuritas:latest 
+    container_name: securities_api_prod
+    
+    # Perbedaan 2: Restart otomatis kalau crash
+    restart: always 
+    
+    ports:
+      - "80:3000" # Di server, user akses port 80 (HTTP), diteruskan ke 3000
+    
+    # Perbedaan 3: Environment Variables
+    # Di server, kita inject env vars lewat fitur CI/CD atau set manual di servernya
+    # File ini cuma template
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # Host DB diisi alamat IP/URL database production
+      DB_HOST: ${PROD_DB_HOST} 
+      DB_USER: ${PROD_DB_USER}
+      DB_PASS: ${PROD_DB_PASS}
+      DB_NAME: ${PROD_DB_NAME}
+      DB_PORT: 5432
+
+# Tidak ada volumes untuk source code! Code sudah ada di dalam image.

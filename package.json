@@ -5,13 +5,17 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/app.js",
-    "dev": "nodemon src/app.js"
+    "dev": "nodemon src/app.js",
+    "env:gen": "node -e \"const fs=require('fs'); const env=fs.readFileSync('.env','utf8'); const example=env.replace(/=.*/g, '='); fs.writeFileSync('.env.example', example);\""
   },
   "keywords": [],
   "author": "Ulhaq Dhifulloh",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "nodemon": "^3.1.11"
+    "knex": "^3.1.0",
+    "nodemon": "^3.1.11",
+    "pg": "^8.18.0"
   }
 }

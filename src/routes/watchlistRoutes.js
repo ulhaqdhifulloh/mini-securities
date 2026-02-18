@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const controller = require('../controllers/watchlistController');
+const watchlistController= require('../controllers/watchlistController');
 
 // Definisi rute
 // GET /api/watchlist
-router.get('/', controller.getStocks);
+router.get('/', watchlistController.getStocks);
 // GET /api/watchlist/{code}
-router.get('/:code', controller.getStock);
+router.get('/:code', watchlistController.getStock);
 // POST /api/watchlist
-router.post('/', controller.addStock);
+router.post('/', watchlistController.addStock);
 // DELETE /api/watchlist/{code}
-router.delete('/:code', controller.deleteStock);
+router.delete('/:code', watchlistController.deleteStock);
 
 module.exports = router;
