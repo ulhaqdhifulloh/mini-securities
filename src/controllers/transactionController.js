@@ -1,4 +1,5 @@
 const db = require('../database/db'); // Import koneksi Knex
+const { publishMessage } = require('../utils/messageQueue'); // Setiap ada transaksi sukses lempar ke RabbitMQ
 
 // Beli Saham
 // POST /api/transaction/buy {req.Body = user_id, stock_code, lot, price}
@@ -69,6 +70,21 @@ const buyStock = async (req, res) => {
             });
         });
 
+        // Lempar tugas ke RabbitMQ secara Asynchronous
+        // Kita lempar data user_id dan total orderannya
+        const eventData = {
+            event: 'ORDER_SUCCESS',
+            user_id: user_id,
+            stock_code: stock_code.toUpperCase(),
+            lot: lot,
+            total_price: total_price,
+            timestamp: new Date()
+        };
+        
+        // Lempar ke antrean tanpa harus nungguin selesai (Fire and Forget)
+        publishMessage(eventData);
+
+        // Langsung kasih response cepat ke User
         res.status(201).json({
             success: true,
             message: `Berhasil beli ${lot} lot ${stock_code.toUpperCase()}`

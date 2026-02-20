@@ -1,45 +1,58 @@
 version: '3.8'
 
 services:
-  # --- SERVICE 1: DATABASE ---
-  db:
-    image: postgres:22-alpine
-    container_name: securities_db
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASS}
-      POSTGRES_DB: ${DB_NAME}
+  # Kita cuma jalankan RabbitMQ di Docker
+  rabbitmq:
+    image: rabbitmq:3-management-alpine # Pakai versi management biar dapet GUI Web
+    container_name: securities_queue
     ports:
-      - "${DB_PORT}:5432" # Mapping port biar bisa diakses dari laptop (opsional)
-    volumes:
-      - pgdata:/var/lib/postgresql/data # Agar data TIDAK HILANG saat kontainer dimatikan
-    restart: unless-stopped
-
-  # --- SERVICE 2: BACKEND API ---
-  # Kalau kamu coding pake 'npm run dev' di luar Docker, service ini bisa di-comment/hapus.
-  # Tapi kalau mau test jalanin full docker, biarkan saja.
-  app:
-    build: . # Bangun dari Dockerfile di folder ini
-    container_name: securities_api
-    ports:
-      - "${PORT}:${PORT}" # Akses dari laptop: localhost:3000
-    depends_on:
-      - db # Tunggu database nyala dulu baru app nyala
+      - "5672:5672"   # Port utama untuk komunikasi Node.js <-> RabbitMQ
+      - "15672:15672" # Port untuk buka Dashboard Web (GUI)
     environment:
-      NODE_ENV: development
-      PORT: ${PORT}
-      # PENTING: Hostnya bukan 'localhost', tapi nama service di atas ('db')
-      DB_HOST: db
-      DB_USER: ${DB_USER}
-      DB_PASS: ${DB_PASS}
-      DB_NAME: ${DB_NAME}
-      DB_PORT: 5432
-    volumes:
-      # PENTING: Sync codingan laptop ke dalam container (Hot Reload)
-      # Jadi kalau kamu edit file, di docker ikut berubah tanpa restart
-      - .:/app
-      - /app/node_modules
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
 
-# Definisi Volume Penyimpanan
-volumes:
-  pgdata:
+# Service 'app' dan 'db' kita hapus/comment dulu dari sini karena jalan di local
+# services:
+#   # --- SERVICE 1: DATABASE ---
+#   db:
+#     image: postgres:22-alpine
+#     container_name: securities_db
+#     environment:
+#       POSTGRES_USER: ${DB_USER}
+#       POSTGRES_PASSWORD: ${DB_PASS}
+#       POSTGRES_DB: ${DB_NAME}
+#     ports:
+#       - "${DB_PORT}:5432" # Mapping port biar bisa diakses dari laptop (opsional)
+#     volumes:
+#       - pgdata:/var/lib/postgresql/data # Agar data TIDAK HILANG saat kontainer dimatikan
+#     restart: unless-stopped
+
+#   # --- SERVICE 2: BACKEND API ---
+#   # Kalau kamu coding pake 'npm run dev' di luar Docker, service ini bisa di-comment/hapus.
+#   # Tapi kalau mau test jalanin full docker, biarkan saja.
+#   app:
+#     build: . # Bangun dari Dockerfile di folder ini
+#     container_name: securities_api
+#     ports:
+#       - "${PORT}:${PORT}" # Akses dari laptop: localhost:3000
+#     depends_on:
+#       - db # Tunggu database nyala dulu baru app nyala
+#     environment:
+#       NODE_ENV: development
+#       PORT: ${PORT}
+#       # PENTING: Hostnya bukan 'localhost', tapi nama service di atas ('db')
+#       DB_HOST: db
+#       DB_USER: ${DB_USER}
+#       DB_PASS: ${DB_PASS}
+#       DB_NAME: ${DB_NAME}
+#       DB_PORT: 5432
+#     volumes:
+#       # PENTING: Sync codingan laptop ke dalam container (Hot Reload)
+#       # Jadi kalau kamu edit file, di docker ikut berubah tanpa restart
+#       - .:/app
+#       - /app/node_modules
+
+# # Definisi Volume Penyimpanan
+# volumes:
+#   pgdata:
